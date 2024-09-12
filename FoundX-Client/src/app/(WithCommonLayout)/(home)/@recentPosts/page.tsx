@@ -1,13 +1,12 @@
 import { Button } from "@nextui-org/button";
-import Container from "../../UI/Container";
 import Link from "next/link";
 import { getRecentPosts } from "@/src/services/RecentPosts";
-import Card from "../../UI/Card";
 import { IPost } from "@/src/types";
+import Container from "@/src/components/UI/Container";
+import Card from "@/src/components/UI/Card";
 
 const RecentPosts = async () => {
   const { data: posts } = await getRecentPosts();
-  console.log(posts);
 
   return (
     <Container>
