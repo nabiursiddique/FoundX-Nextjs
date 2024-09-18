@@ -9,12 +9,13 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/dropdown";
+import { user } from "@nextui-org/theme";
 
 import { useRouter } from "next/navigation";
 
 const NavbarDropdown = () => {
   const router = useRouter();
-  const { setIsLoading: userLoading } = useUser();
+  const { user, setIsLoading: userLoading } = useUser();
 
   const handleLogout = () => {
     logout();
@@ -27,7 +28,7 @@ const NavbarDropdown = () => {
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Avatar className="cursor-pointer" name="Joe" />
+        <Avatar className="cursor-pointer" src={user?.profilePhoto} />
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions">
         <DropdownItem onClick={() => handleNavigation("/profile")}>
