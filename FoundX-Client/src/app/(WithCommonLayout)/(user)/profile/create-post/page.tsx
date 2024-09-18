@@ -20,7 +20,11 @@ const CreatePost = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
+    const postData = {
+      ...data,
+      questions: data.questions.map((ques: { value: string }) => ques.value),
+    };
+    console.log(postData);
   };
 
   const handleFieldAppend = () => {
@@ -41,8 +45,9 @@ const CreatePost = () => {
           </div>
 
           {fields.map((field, index) => (
-            <div key={field.id}>
+            <div key={field.id} className="flex items-center">
               <FXInput name={`questions.${index}.value`} label="Question" />
+              <Button onClick={() => remove(index)}>Remove</Button>
             </div>
           ))}
 
