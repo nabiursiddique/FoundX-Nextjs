@@ -15,6 +15,7 @@ import {
 } from "react-hook-form";
 import { allDistict } from "@bangladeshi/bangladesh-address";
 import { useGetCategories } from "@/src/hooks/categories.hook";
+import { ChangeEvent, useState } from "react";
 
 const cityOptions = allDistict()
   .sort()
@@ -26,6 +27,10 @@ const cityOptions = allDistict()
   });
 
 const CreatePost = () => {
+  const [imageFiles, setImageFiles] = useState<File[] | []>([]);
+
+  console.log(imageFiles);
+
   const {
     data: categoriesData,
     isLoading: categoryLoading,
@@ -65,6 +70,12 @@ const CreatePost = () => {
     append({ name: "questions" });
   };
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files![0];
+
+    setImageFiles((prev) => [...prev, file]);
+  };
+
   return (
     <div className="h-full rounded-xl bg-gradient-to-b from-default-100 px-[73px] py-12">
       <h1 className="text-2xl font-semibold">Post a found item</h1>
@@ -97,7 +108,19 @@ const CreatePost = () => {
               />
             </div>
             <div className="min-w-fit flex-1">
-              <FXInput name="title" label="Upload Image" />
+              <label
+                className="bg-gray-500 block w-full h-full rounded-md"
+                htmlFor="image"
+              >
+                Upload Image
+              </label>
+              <input
+                className="hidden"
+                multiple
+                type="file"
+                id="image"
+                onChange={(e) => handleImageChange(e)}
+              />
             </div>
           </div>
 
