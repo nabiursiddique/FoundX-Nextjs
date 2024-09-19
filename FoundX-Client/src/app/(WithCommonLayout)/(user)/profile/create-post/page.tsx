@@ -2,6 +2,7 @@
 
 import FXDatePicker from "@/src/components/form/FXDatePicker";
 import FXInput from "@/src/components/form/FXInput";
+import dateToISO from "@/src/utils/dateToISO";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import {
@@ -24,6 +25,7 @@ const CreatePost = () => {
     const postData = {
       ...data,
       questions: data.questions.map((ques: { value: string }) => ques.value),
+      dateFound: dateToISO(data.dateFound),
     };
     console.log(postData);
   };
@@ -40,10 +42,10 @@ const CreatePost = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-wrap gap-2 py-2">
             <div className="min-w-fit flex-1">
-              <FXInput name="title" label="Title" />
+              <FXInput label="Title" name="title" />
             </div>
             <div className="min-w-fit flex-1">
-              <FXDatePicker label="Found Date" name="dateFound" />
+              <FXDatePicker label="Found date" name="dateFound" />
             </div>
           </div>
           <div className="flex flex-wrap gap-2 py-2">
