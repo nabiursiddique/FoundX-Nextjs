@@ -28,8 +28,9 @@ const cityOptions = allDistict()
 
 const CreatePost = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[] | []>([]);
 
-  console.log(imageFiles);
+  console.log(imagePreviews);
 
   const {
     data: categoriesData,
@@ -72,8 +73,16 @@ const CreatePost = () => {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files![0];
-
     setImageFiles((prev) => [...prev, file]);
+
+    //* for preview images
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -121,6 +130,24 @@ const CreatePost = () => {
                 id="image"
                 onChange={(e) => handleImageChange(e)}
               />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex gap-5 my-5 flex-wrap">
+              {imagePreviews.length > 0 &&
+                imagePreviews.map((imageDataUrl) => (
+                  <div
+                    key={imageDataUrl}
+                    className="relative h-48 w-48 rounded-xl border-2 border-dashed border-default-300 p-2"
+                  >
+                    <img
+                      className="h-full w-full object-cover object-center rounded-md"
+                      src={imageDataUrl}
+                      alt="item"
+                    />
+                  </div>
+                ))}
             </div>
           </div>
 
