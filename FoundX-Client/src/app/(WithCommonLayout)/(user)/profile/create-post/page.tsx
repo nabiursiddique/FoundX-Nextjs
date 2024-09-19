@@ -26,8 +26,11 @@ const cityOptions = allDistict()
   });
 
 const CreatePost = () => {
-  const { data: categoriesData, isLoading: categoryLoading } =
-    useGetCategories();
+  const {
+    data: categoriesData,
+    isLoading: categoryLoading,
+    isSuccess: categorySuccess,
+  } = useGetCategories();
 
   let categoryOption: { key: string; label: string }[] = [];
 
@@ -90,6 +93,7 @@ const CreatePost = () => {
                 name="category"
                 label="Category"
                 options={categoryOption}
+                disabled={!categorySuccess}
               />
             </div>
             <div className="min-w-fit flex-1">
