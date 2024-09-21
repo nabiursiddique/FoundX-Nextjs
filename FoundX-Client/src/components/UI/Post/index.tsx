@@ -14,8 +14,17 @@ interface IProps {
 }
 
 const Post = ({ post }: IProps) => {
-  const { title, dateFound, description, location, city, _id, images, user } =
-    post || {};
+  const {
+    title,
+    dateFound,
+    description,
+    location,
+    city,
+    _id,
+    images,
+    user,
+    questions,
+  } = post || {};
 
   const { name, email, profilePhoto } = (user as IUser) || {};
 
@@ -55,7 +64,7 @@ const Post = ({ post }: IProps) => {
         <ImageGallery images={images} />
 
         <div className="mt-4 flex gap-5">
-          <ClaimRequestModal />
+          <ClaimRequestModal id={_id} questions={questions} />
           <div className="w-[1px] bg-default-200" />
           <Button variant="light" className="flex-1">
             Share
