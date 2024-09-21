@@ -3,6 +3,8 @@ import FXForm from "../form/FXForm";
 import FXInput from "../form/FXInput";
 import FXTextarea from "../form/FXTextarea";
 import FXModal from "./FXModal";
+import { FieldValues, SubmitHandler } from "react-hook-form";
+import { useAddClaimRequest } from "@/src/hooks/claimRequest.hook";
 
 interface IProps {
   id: string;
@@ -10,8 +12,18 @@ interface IProps {
 }
 
 const ClaimRequestModal = ({ id, questions }: IProps) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const { mutate: handleClaimRequest, isPending } = useAddClaimRequest();
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const claimRequestData = {
+      item: id,
+      description: data.description,
+      answers: Object.keys(data)
+        .filter((formElement) => formElement.startsWith("answer"))
+        .map((answer) => data[answer]),
+    };
+
+    handleClaimRequest(claimRequestData);
   };
 
   return (
@@ -26,14 +38,16 @@ const ClaimRequestModal = ({ id, questions }: IProps) => {
             <p className="mb-1">{question}</p>
             <FXInput
               label={`Answer - ${index + 1}`}
-              name={`Answer - ${index + 1}`}
+              name={`answer-${index + 1}`}
             />
           </div>
         ))}
-        <FXTextarea name="description" label="Description" />
+
+        <FXTextarea label="Description" name="description" />
+
         <div>
-          <Button className="flex-1 my-2 w-full" size="lg" type="submit">
-            Send
+          <Button className="w-full flex-1 my-2" size="lg" type="submit">
+            {isPending ? "Sending.." : "Send"}
           </Button>
         </div>
       </FXForm>
