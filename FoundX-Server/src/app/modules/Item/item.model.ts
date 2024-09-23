@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
+import { ItemCategory } from '../ItemCategory/itemCategory.model';
 import { DISTRICTS, ITEM_STATUS } from './item.constant';
 import { TItem } from './item.interface';
-import { ItemCategory } from '../ItemCategory/itemCategory.model';
 
 const itemSchema = new Schema<TItem>(
   {
@@ -56,6 +56,12 @@ const itemSchema = new Schema<TItem>(
     questions: {
       type: [String],
       default: [],
+    },
+    claimRequests: {
+      type: [Schema.Types.ObjectId],
+      ref: 'ClaimRequest',
+      default: [],
+      select: 0,
     },
   },
   {

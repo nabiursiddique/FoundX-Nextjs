@@ -28,6 +28,7 @@ const registerUser = async (payload: TRegisterUser) => {
     name: newUser.name,
     email: newUser.email,
     mobileNumber: newUser.mobileNumber,
+    profilePhoto: newUser.profilePhoto,
     role: newUser.role,
     status: newUser.status,
   };
@@ -77,6 +78,7 @@ const loginUser = async (payload: TLoginUser) => {
     name: user.name,
     email: user.email,
     mobileNumber: user.mobileNumber,
+    profilePhoto: user.profilePhoto,
     role: user.role,
     status: user.status,
   };
@@ -178,6 +180,7 @@ const refreshToken = async (token: string) => {
     name: user.name,
     email: user.email,
     mobileNumber: user.mobileNumber,
+    profilePhoto: user.profilePhoto,
     role: user.role,
     status: user.status,
   };

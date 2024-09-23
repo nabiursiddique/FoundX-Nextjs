@@ -8,6 +8,7 @@ import { ItemsSearchableFields } from './item.constant';
 import { TItem } from './item.interface';
 import { Item } from './item.model';
 import {
+  SearchItemByCategoryQueryMaker,
   SearchItemByDateRangeQueryMaker,
   SearchItemByUserQueryMaker,
 } from './item.utils';
@@ -27,6 +28,8 @@ const getAllItemsFromDB = async (query: Record<string, unknown>) => {
 
   // Date range search
   query = (await SearchItemByDateRangeQueryMaker(query)) || query;
+
+  query = (await SearchItemByCategoryQueryMaker(query)) || query;
 
   const itemQuery = new QueryBuilder(
     Item.find().populate('user').populate('category'),
@@ -66,6 +69,7 @@ const deleteItemFromDB = async (itemId: string) => {
   if (deletedItemId) {
     await deleteDocumentFromIndex('items', deletedItemId.toString());
   }
+
   return result;
 };
 

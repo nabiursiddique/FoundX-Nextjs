@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { TClaimRequest } from '../ClaimRequest/claimRequest.interface';
 import { DISTRICTS, ITEM_STATUS } from './item.constant';
 
 type District = (typeof DISTRICTS)[number];
@@ -18,4 +19,5 @@ export type TItem = {
   questions?: string[];
   createdAt?: Date;
   updatedAt?: Date;
+  claimRequests?: TClaimRequest[];
 };

@@ -158,9 +158,8 @@ JWT_ACCESS_EXPIRES_IN=7d
 JWT_REFRESH_SECRET=refreshsecret
 JWT_REFRESH_EXPIRES_IN=1y
 ADMIN_EMAIL=admin@gmail.com
-ADMIN_PASSWORD=123456
+ADMIN_PASSWORD=admin
 ADMIN_MOBILE_NUMBER=1234567890
-ADMIN_PROFILE_PHOTO=https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png
 ```
 
 ## **5. Run the Project**
@@ -222,7 +221,7 @@ To start the project in production mode:
 Once the server is running, you can access the application in your browser by visiting:
 
 ```bash
-http://localhost:5000
+http://localhost:3000
 ```
 
 This guide should help you set up, configure, and run your project seamlessly. If you encounter any issues or need further assistance, feel free to ask!

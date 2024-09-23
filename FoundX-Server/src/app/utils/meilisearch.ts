@@ -45,4 +45,8 @@ export const deleteDocumentFromIndex = async (indexKey: string, id: string) => {
   }
 };
 
+export const deleteMeiliSearchIndex = async (indexKey: string) => {
+  meiliClient.deleteIndex(indexKey);
+};
+
 export default meiliClient;

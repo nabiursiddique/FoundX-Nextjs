@@ -1,8 +1,8 @@
 {
-  "name": "found-x-server",
+  "name": "lost-and-found-server",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Next Level Developer",
+  "author": "Mir Hussain",
   "license": "MIT",
   "scripts": {
     "start": "node dist/server.js",
@@ -18,7 +18,7 @@
     "handlebars": "^4.7.8",
     "http-status": "^1.7.4",
     "jsonwebtoken": "^9.0.2",
-    "meilisearch": "^0.42.0",
+    "meilisearch": "^0.41.0",
     "mongoose": "^8.4.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",

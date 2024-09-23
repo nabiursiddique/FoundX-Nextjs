@@ -6,6 +6,7 @@ import sendResponse from '../../utils/sendResponse';
 import { ItemServices } from './item.service';
 
 const createItem = catchAsync(async (req, res) => {
+  console.log(req.headers);
   if (!req.files) {
     throw new AppError(400, 'Please upload an image');
   }

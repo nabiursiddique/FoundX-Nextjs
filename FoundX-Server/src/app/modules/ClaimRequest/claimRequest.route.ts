@@ -1,9 +1,9 @@
-import { ClaimRequestValidation } from './claimRequest.validation';
 import express from 'express';
-import { ClaimRequestControllers } from './claimRequest.controller';
 import auth from '../../middlewares/auth';
-import { USER_ROLE } from '../User/user.constant';
 import validateRequest from '../../middlewares/validateRequest';
+import { USER_ROLE } from '../User/user.constant';
+import { ClaimRequestControllers } from './claimRequest.controller';
+import { ClaimRequestValidation } from './claimRequest.validation';
 
 const router = express.Router();
 
@@ -35,7 +35,9 @@ router.post(
 router.put(
   '/:id',
   auth(USER_ROLE.USER),
-  validateRequest(ClaimRequestValidation.updateClaimRequestStatusWithFeedbackSchema),
+  validateRequest(
+    ClaimRequestValidation.updateClaimRequestStatusWithFeedbackSchema
+  ),
   ClaimRequestControllers.updateStatusWithFeedback
 );
 

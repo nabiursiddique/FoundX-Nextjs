@@ -1,77 +1,108 @@
 import httpStatus from 'http-status';
-import AppError from '../../errors/AppError';
-import { Item } from '../Item/item.model';
-import { IItem, IUser, TAnswers, TClaimRequest } from './claimRequest.interface';
 import { JwtPayload } from 'jsonwebtoken';
-import { ClaimRequest } from './claimRequest.model';
 import { QueryBuilder } from '../../builder/QueryBuilder';
-import { CLAIM_REQUEST_STATUS } from './claimRequest.constant';
+import AppError from '../../errors/AppError';
 import { EmailHelper } from '../../utils/emailSender';
+import { Item } from '../Item/item.model';
+import { CLAIM_REQUEST_STATUS } from './claimRequest.constant';
+import {
+  IItem,
+  IUser,
+  TAnswers,
+  TClaimRequest,
+} from './claimRequest.interface';
+import { ClaimRequest } from './claimRequest.model';
+
+import mongoose from 'mongoose';
 
 const createClaimRequest = async (payload: TClaimRequest, user: JwtPayload) => {
-  const item = await Item.findById(payload.item);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (!item) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Item not found!');
-  }
+  try {
+    const item = await Item.findById(payload.item).session(session);
 
-  if (item.user.toString() === user._id) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Since you found the item,so you are not able to claim it'
+    if (!item) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Item not found!');
+    }
+
+    if (item.user.toString() === user._id) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Since you found the item, you are not able to claim it'
+      );
+    }
+
+    const isClaimRequestExists = await ClaimRequest.findOne({
+      item: item._id,
+      claimant: user._id,
+    }).session(session); // Query with session
+
+    if (isClaimRequestExists) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have already created a claim request!'
+      );
+    }
+
+    let questionAnswers: TAnswers[] = [];
+
+    if (item.questions?.length) {
+      questionAnswers = item.questions.map((question, index) => {
+        return {
+          question: question,
+          answer: payload.answers?.length
+            ? (payload.answers[index] as unknown as string)
+            : '',
+        };
+      });
+    }
+
+    const claimRequest = await ClaimRequest.create(
+      [
+        {
+          item: payload.item,
+          claimant: user._id,
+          description: payload.description,
+          answers: questionAnswers,
+        },
+      ],
+      { session }
     );
-  }
 
-  const isClaimRequestExists = await ClaimRequest.findOne({
-    item: item._id,
-    claimant: user._id,
-  });
-
-  if (isClaimRequestExists) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You already create a claim request!'
+    await Item.findByIdAndUpdate(
+      item._id,
+      {
+        $push: { claimRequests: claimRequest[0]._id },
+      },
+      { session }
     );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return claimRequest;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  let questionAnswers: TAnswers[] = [];
-
-  if (item.questions?.length) {
-    questionAnswers = item.questions.map((question, index) => {
-      return {
-        question: question,
-        answer: payload.answers?.length
-          ? (payload.answers[index] as unknown as string)
-          : '',
-      };
-    });
-  }
-
-  const result = await ClaimRequest.create({
-    item: payload.item,
-    claimant: user._id,
-    description: payload.description,
-    answers: questionAnswers,
-  });
-  return result;
 };
 
 const viewReceivedClaimRequests = async (
   query: Record<string, unknown>,
   user: JwtPayload
 ) => {
-  // user._id = "64ecf4f2b95e9b54a5c9e5f9"
-  const items = await Item.find({ user: user._id }).select('_id').exec();
-
-  if (!items) {
-    throw new AppError(httpStatus.NOT_FOUND, 'No item found!');
-  }
-  const itemIds = items.map((item) => item._id);
-
-  const itemQuery = new QueryBuilder(
-    ClaimRequest.find({ item: { $in: itemIds } })
-      .populate('claimant')
-      .populate('item'),
+  const items = new QueryBuilder(
+    Item.find({
+      user: user._id,
+      claimRequests: { $exists: true, $not: { $size: 0 } },
+    }).populate({
+      path: 'claimRequests',
+      populate: {
+        path: 'claimant',
+      },
+    }),
     query
   )
     .filter()
@@ -79,7 +110,11 @@ const viewReceivedClaimRequests = async (
     .paginate()
     .fields();
 
-  const result = await itemQuery.modelQuery;
+  if (!items) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No item found!');
+  }
+
+  const result = await items.modelQuery;
 
   return result;
 };
@@ -131,7 +166,9 @@ const updateStatusWithFeedback = async (
 
   const result = await ClaimRequest.findByIdAndUpdate(id, payload, {
     new: true,
-  }).populate('item').populate('claimant');
+  })
+    .populate('item')
+    .populate('claimant');
 
   const populatedItem = result?.item as IItem;
   const populatedClaimant = result?.claimant as IUser;
@@ -140,10 +177,13 @@ const updateStatusWithFeedback = async (
     recipient_name: populatedClaimant.name,
     item_name: populatedItem.title,
     feedback: result?.feedback,
-    isApproved: result?.status === CLAIM_REQUEST_STATUS.APPROVED
-  }
+    isApproved: result?.status === CLAIM_REQUEST_STATUS.APPROVED,
+  };
 
-  const emailTemplate = await EmailHelper.createEmailContent(emailData, 'claimNotification');
+  const emailTemplate = await EmailHelper.createEmailContent(
+    emailData,
+    'claimNotification'
+  );
   await EmailHelper.sendEmail(
     populatedClaimant.email,
     emailTemplate,
