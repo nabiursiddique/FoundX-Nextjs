@@ -35,13 +35,6 @@ const RegisterPage = () => {
       <p className="mb-4">Help Lost Items Find Their Way Home</p>
       <div className="w-[35%]">
         <FXForm
-          //! Only for development
-          defaultValues={{
-            name: "Nabil",
-            email: "nabil@gmail.com",
-            mobileNumber: "01711223344",
-            password: "123456",
-          }}
           resolver={zodResolver(registerValidationSchema)}
           onSubmit={onSubmit}
         >

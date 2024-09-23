@@ -3,7 +3,9 @@
 import envConfig from "@/src/config/envConfig";
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { revalidateTag } from "next/cache";
+import { getCurrentUser } from "../AuthService";
 
+// create post
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
     const { data } = await axiosInstance.post("/items", formData, {
@@ -20,6 +22,7 @@ export const createPost = async (formData: FormData): Promise<any> => {
   }
 };
 
+// Get all posts
 export const getPost = async (postId: string) => {
   let fetchOptions = {};
 
@@ -33,4 +36,13 @@ export const getPost = async (postId: string) => {
   }
 
   return res.json();
+};
+
+// Get post which is logged in
+export const getMyPosts = async () => {
+  const user = await getCurrentUser();
+
+  const res = await axiosInstance.get(`/items?user=${user?._id}`);
+
+  return res.data;
 };
