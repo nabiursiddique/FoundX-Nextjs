@@ -36,6 +36,8 @@ const cityOptions = allDistict()
 const CreatePost = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreviews, setImagePreviews] = useState<string[] | []>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
@@ -109,14 +111,18 @@ const CreatePost = () => {
 
   // Description generation with gemini ai from preview image
   const handleDescriptionGeneration = async () => {
+    setIsLoading(true);
     try {
       const response = await generateDescription(
         imagePreviews[0],
         "write a description for social media post, describing the given image that starts with 'Found this....'"
       );
-      console.log(response);
-    } catch (err) {
+      methods.setValue("description", response);
+      setIsLoading(false);
+    } catch (error: any) {
       console.error(error);
+      setIsLoading(false);
+      setError(error.message);
     }
   };
 
@@ -195,11 +201,23 @@ const CreatePost = () => {
               <div className="min-w-fit flex-1">
                 <FXTextarea label="Description" name="description" />
               </div>
+              {error && <p className="text-sm text-red-600">{error}</p>}
             </div>
 
-            <Button onClick={() => handleDescriptionGeneration()}>
-              Generate With AI
-            </Button>
+            <div className="flex justify-end gap-5">
+              {methods.getValues("description") && (
+                <Button onClick={() => methods.resetField("description")}>
+                  Clear
+                </Button>
+              )}
+              <Button
+                isDisabled={imagePreviews.length > 0 ? false : true}
+                isLoading={isLoading}
+                onClick={() => handleDescriptionGeneration()}
+              >
+                {isLoading ? "Generating..." : "Generate With AI"}
+              </Button>
+            </div>
 
             <Divider className="my-5" />
 
