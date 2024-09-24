@@ -22,6 +22,7 @@ import { useUser } from "@/src/context/user.provider";
 import { useCreatePost } from "@/src/hooks/post.hook";
 import Loading from "@/src/components/UI/Loading";
 import { useRouter } from "next/navigation";
+import generateDescription from "@/src/services/ImageDescription";
 
 const cityOptions = allDistict()
   .sort()
@@ -91,6 +92,7 @@ const CreatePost = () => {
     append({ name: "questions" });
   };
 
+  // Image change in preview image
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files![0];
     setImageFiles((prev) => [...prev, file]);
@@ -102,6 +104,19 @@ const CreatePost = () => {
         setImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Description generation with gemini ai from preview image
+  const handleDescriptionGeneration = async () => {
+    try {
+      const response = await generateDescription(
+        imagePreviews[0],
+        "write a description for social media post, describing the given image that starts with 'Found this....'"
+      );
+      console.log(response);
+    } catch (err) {
+      console.error(error);
     }
   };
 
@@ -181,6 +196,10 @@ const CreatePost = () => {
                 <FXTextarea label="Description" name="description" />
               </div>
             </div>
+
+            <Button onClick={() => handleDescriptionGeneration()}>
+              Generate With AI
+            </Button>
 
             <Divider className="my-5" />
 
